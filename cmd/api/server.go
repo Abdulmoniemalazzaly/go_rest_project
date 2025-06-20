@@ -5,17 +5,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	mw "restproject/internal/api/middlewares"
 	"restproject/internal/api/router"
+	"restproject/internal/repository/sqlconnect"
 	"restproject/pkg/utils"
 	"time"
 
+	"github.com/lpernett/godotenv"
 	"golang.org/x/net/http2"
 )
 
 func main() {
-
-	const port = 8080
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+	_, err = sqlconnect.ConnectDB()
+	if err != nil {
+		panic(err)
+	}
+	port := os.Getenv("API_PORT")
 
 	// load the TLS cert and key
 	const cert = "server.cert"
@@ -32,7 +42,7 @@ func main() {
 
 	// create a custom server
 	server := &http.Server{
-		Addr:      fmt.Sprintf(":%d", port),
+		Addr:      fmt.Sprintf(":%s", port),
 		Handler:   securityMux,
 		TLSConfig: tlsConfig,
 	}
@@ -44,7 +54,7 @@ func main() {
 
 	fmt.Println("Server started on port:", port)
 
-	err := server.ListenAndServeTLS(cert, key)
+	err = server.ListenAndServeTLS(cert, key)
 	if err != nil {
 		log.Fatalln("error starting server", err)
 	}
