@@ -6,5 +6,5 @@ import (
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Handling orders")
+	fmt.Fprintln(w, "Handling...")
 }
